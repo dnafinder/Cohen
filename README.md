@@ -52,18 +52,18 @@ Syntax: 	kappa(X,W,ALPHA)
 
 UNWEIGHTED COHEN'S KAPPA
 --------------------------------------------------------------------------------
-Observed agreement (po) = 0.7000
-Random agreement (pe) = 0.4100
-Agreement due to true concordance (po-pe) = 0.2900
-Residual not random agreement (1-pe) = 0.5900
-Cohen's kappa = 0.4915
-kappa error = 0.0549
-kappa C.I. (alpha = 0.0500) = 0.3839     0.5992
-Maximum possible kappa, given the observed marginal frequencies = 0.8305
-k observed as proportion of maximum possible = 0.5918
-Moderate agreement
-Variance = 0.0031     z (k/sqrt(var)) = 8.8347    p = 0.0000
-Reject null hypotesis: observed agreement is not accidental
+Observed agreement (po) = 0.7000<br/>
+Random agreement (pe) = 0.4100<br/>
+Agreement due to true concordance (po-pe) = 0.2900<br/>
+Residual not random agreement (1-pe) = 0.5900<br/>
+Cohen's kappa = 0.4915<br/>
+kappa error = 0.0549<br/>
+kappa C.I. (alpha = 0.0500) = 0.3839     0.5992<br/>
+Maximum possible kappa, given the observed marginal frequencies = 0.8305<br/>
+k observed as proportion of maximum possible = 0.5918<br/>
+Moderate agreement<br/>
+Variance = 0.0031     z (k/sqrt(var)) = 8.8347    p = 0.0000<br/>
+Reject null hypotesis: observed agreement is not accidental<br/>
 
           Created by Giuseppe Cardillo
           giuseppe.cardillo-edta@poste.it
