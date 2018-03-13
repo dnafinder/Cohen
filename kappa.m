@@ -153,7 +153,7 @@ end
             disp('Perfect agreement')
         end
         fprintf('Variance = %0.4f     z (k/sqrt(var)) = %0.4f    p = %0.4f\n',var,z,p)
-        if p<0.05
+        if p<alpha
             disp('Reject null hypotesis: observed agreement is not accidental')
         else
             disp('Accept null hypotesis: observed agreement is accidental')
