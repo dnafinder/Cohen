@@ -69,14 +69,14 @@ function kappa(x,varargin)
 %           giuseppe.cardillo-edta@poste.it
 %
 % To cite this file, this would be an appropriate format:
-% Cardillo G. (2007) Cohen's kappa: compute the Cohen's kappa ratio on a 2x2 matrix.   
+% Cardillo G. (2007) Cohen's kappa: compute the Cohen's kappa ratio on a square matrix.   
 % http://www.mathworks.com/matlabcentral/fileexchange/15365
 
 %Input Error handling
 p = inputParser;
 addRequired(p,'x',@(x) validateattributes(x,{'numeric'},{'square','nonempty','integer','real','finite','nonnan','nonnegative'}));
 addOptional(p,'w',0, @(x) isnumeric(x) && isreal(x) && isfinite(x) && isscalar(x) && ismember(x,[-1 0 1 2]));
-addOptional(p,'alpha',0.05, @(x) isnumeric(x) && isreal(x) && isfinite(x) && isscalar(x) && (x>0 || x<1));
+addOptional(p,'alpha',0.05, @(x) validateattributes(x,{'numeric'},{'scalar','real','finite','nonnan','>',0,'<',1}));
 parse(p,x,varargin{:});
 x=p.Results.x; w=p.Results.w; alpha=p.Results.alpha;
 clear p default* validation*

@@ -69,5 +69,5 @@ Reject null hypotesis: observed agreement is not accidental<br/>
           giuseppe.cardillo-edta@poste.it
 
 To cite this file, this would be an appropriate format:
-Cardillo G. (2007) Cohen's kappa: compute the Cohen's kappa ratio on a 2x2 matrix.   
+Cardillo G. (2007) Cohen's kappa: compute the Cohen's kappa ratio on a square matrix.   
 http://www.mathworks.com/matlabcentral/fileexchange/15365
