@@ -26,7 +26,7 @@ function kappa(x,varargin)
 %     Inputs:
 %           X - square data matrix
 %           W - Weight (0 = unweighted; 1 = linear weighted; 2 = quadratic
-%           weighted; -1 = display all. Default=0)
+%           weighted; Default=0)
 %           ALPHA - default=0.05.
 %
 %     Outputs:
@@ -62,7 +62,7 @@ function kappa(x,varargin)
 % Maximum possible kappa, given the observed marginal frequencies = 0.8305
 % k observed as proportion of maximum possible = 0.5918
 % Moderate agreement
-% Variance = 0.0031     z (k/sqrt(var)) = 8.8347    p = 0.0000
+% z (k/kappa error) = 8.8347    p = 0.0000
 % Reject null hypotesis: observed agreement is not accidental
 %
 %           Created by Giuseppe Cardillo
@@ -75,7 +75,7 @@ function kappa(x,varargin)
 %Input Error handling
 p = inputParser;
 addRequired(p,'x',@(x) validateattributes(x,{'numeric'},{'square','nonempty','integer','real','finite','nonnan','nonnegative'}));
-addOptional(p,'w',0, @(x) isnumeric(x) && isreal(x) && isfinite(x) && isscalar(x) && ismember(x,[-1 0 1 2]));
+addOptional(p,'w',0, @(x) isnumeric(x) && isreal(x) && isfinite(x) && isscalar(x) && ismember(x,[0 1 2]));
 addOptional(p,'alpha',0.05, @(x) validateattributes(x,{'numeric'},{'scalar','real','finite','nonnan','>',0,'<',1}));
 parse(p,x,varargin{:});
 x=p.Results.x; w=p.Results.w; alpha=p.Results.alpha;
@@ -83,29 +83,28 @@ clear p default* validation*
 
 m=size(x,1);
 tr=repmat('-',1,80);
-if w==0 || w==-1
-    f=diag(ones(1,m)); %unweighted
-    disp('UNWEIGHTED COHEN''S KAPPA')
-    disp(tr)
-    kcomp;
-    disp(' ')
-end
-if w==1 || w==-1
-    J=repmat((1:1:m),m,1);
-    I=flipud(rot90(J));
-    f=1-abs(I-J)./(m-1); %linear weight
-    disp('LINEAR WEIGHTED COHEN''S KAPPA')
-    disp(tr)
-    kcomp;
-    disp(' ')
-end
-if w==2 || w==-1
-    J=repmat((1:1:m),m,1);
-    I=flipud(rot90(J));
-    f=1-((I-J)./(m-1)).^2; %quadratic weight
-    disp('QUADRATIC WEIGHTED COHEN''S KAPPA')
-    disp(tr)
-    kcomp;
+switch w
+    case 0
+        f=diag(ones(1,m)); %unweighted
+        disp('UNWEIGHTED COHEN''S KAPPA')
+        disp(tr)
+        kcomp;
+        disp(' ')
+    case 1
+        J=repmat((1:1:m),m,1);
+        I=flipud(rot90(J));
+        f=1-abs(I-J)./(m-1); %linear weight
+        disp('LINEAR WEIGHTED COHEN''S KAPPA')
+        disp(tr)
+        kcomp;
+        disp(' ')
+    case 2
+        J=repmat((1:1:m),m,1);
+        I=flipud(rot90(J));
+        f=1-((I-J)./(m-1)).^2; %quadratic weight
+        disp('QUADRATIC WEIGHTED COHEN''S KAPPA')
+        disp(tr)
+        kcomp;
 end
 
     function kcomp
@@ -114,20 +113,15 @@ end
         r=sum(x,2); %rows sum
         s=sum(x); %columns sum
         Ex=r*s; %expected proportion for random agree
-        pom=sum(min([r';s])); %maximum proportion observable
         po=sum(sum(x.*f)); %proportion observed
         pe=sum(sum(Ex.*f)); %proportion expected
         k=(po-pe)/(1-pe); %Cohen's kappa
+        pom=sum(min([r';s])); %maximum proportion observable
         km=(pom-pe)/(1-pe); %maximum possible kappa, given the observed marginal frequencies
         ratio=k/km; %observed as proportion of maximum possible
         sek=sqrt((po*(1-po))/(n*(1-pe)^2)); %kappa standard error for confidence interval
         ci=k+([-1 1].*(abs(-realsqrt(2)*erfcinv(alpha))*sek)); %k confidence interval
-        wbari=r'*f;
-        wbarj=s*f;
-        wbar=repmat(wbari',1,m)+repmat(wbarj,m,1);
-        a=Ex.*((f-wbar).^2);
-        var=(sum(a(:))-pe^2)/(n*((1-pe)^2)); %variance
-        z=k/sqrt(var); %normalized kappa
+        z=k/sek; %normalized kappa
         p=(1-0.5*erfc(-abs(z)/realsqrt(2)))*2;
         %display results
         fprintf('Observed agreement (po) = %0.4f\n',po)
@@ -152,7 +146,7 @@ end
         elseif k>=0.81 && k<=1
             disp('Perfect agreement')
         end
-        fprintf('Variance = %0.4f     z (k/sqrt(var)) = %0.4f    p = %0.4f\n',var,z,p)
+        fprintf('z (k/kappa error) = %0.4f    p = %0.4f\n',z,p)
         if p<alpha
             disp('Reject null hypotesis: observed agreement is not accidental')
         else
