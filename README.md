@@ -1,73 +1,217 @@
-# Cohen
-This function computes the Cohen's kappa coefficient<br/>
-Cohen's kappa coefficient is a statistical measure of inter-rater
-reliability. It is generally thought to be a more robust measure than
-simple percent agreement calculation since k takes into account the
-agreement occurring by chance.
-Kappa provides a measure of the degree to which two judges, A and B,
-concur in their respective sortings of N items into k mutually exclusive
-categories. A 'judge' in this context can be an individual human being, a
-set of individuals who sort the N items collectively, or some non-human
-agency, such as a computer program or diagnostic test, that performs a
-sorting on the basis of specified criteria.
-The original and simplest version of kappa is the unweighted kappa
-coefficient introduced by J. Cohen in 1960. When the categories are
-merely nominal, Cohen's simple unweighted coefficient is the only form of
-kappa that can meaningfully be used. If the categories are ordinal and if
-it is the case that category 2 represents more of something than category
-1, that category 3 represents more of that same something than category
-2, and so on, then it is potentially meaningful to take this into
-account, weighting each cell of the matrix in accordance with how near it
-is to the cell in that row that includes the absolutely concordant items.
-This function can compute a linear weights or a quadratic weights.
+[![Open in MATLAB Online](https://www.mathworks.com/images/responsive/global/open-in-matlab-online.svg)](https://matlab.mathworks.com/open/github/v1?repo=dnafinder/Cohen&file=kappa.m)
 
-Syntax: 	kappa(X,W,ALPHA)
-     
-    Inputs:
-          X - square data matrix
-          W - Weight (0 = unweighted; 1 = linear weighted; 2 = quadratic
-          weighted; -1 = display all. Default=0)
-          ALPHA - default=0.05.
+# Cohen – Cohen's kappa in MATLAB (kappa.m)
 
-    Outputs:
-          - Observed agreement percentage
-          - Random agreement percentage
-          - Agreement percentage due to true concordance
-          - Residual not random agreement percentage
-          - Cohen's kappa 
-          - kappa error
-          - kappa confidence interval
-          - Maximum possible kappa
-          - k observed as proportion of maximum possible
-          - k benchmarks by Landis and Koch 
-          - z test results
+## 📌 Overview
 
-     Example: 
+This repository provides a MATLAB implementation of **Cohen's kappa** coefficient for inter-rater agreement, with support for:
 
-          x=[88 14 18; 10 40 10; 2 6 12];
+- Unweighted kappa (nominal categories)
+- Linearly weighted kappa (ordinal categories)
+- Quadratically weighted kappa (ordinal categories)
+- Custom user-defined weight matrices
 
-          Calling on Matlab the function: kappa(x)
+The main function is:
 
-          Answer is:
+- kappa.m
 
-UNWEIGHTED COHEN'S KAPPA
---------------------------------------------------------------------------------
-Observed agreement (po) = 0.7000<br/>
-Random agreement (pe) = 0.4100<br/>
-Agreement due to true concordance (po-pe) = 0.2900<br/>
-Residual not random agreement (1-pe) = 0.5900<br/>
-Cohen's kappa = 0.4915<br/>
-kappa error = 0.0549<br/>
-kappa C.I. (alpha = 0.0500) = 0.3839     0.5992<br/>
-Maximum possible kappa, given the observed marginal frequencies = 0.8305<br/>
-k observed as proportion of maximum possible = 0.5918<br/>
-Moderate agreement<br/>
-Variance = 0.0031     z (k/sqrt(var)) = 8.8347    p = 0.0000<br/>
-Reject null hypotesis: observed agreement is not accidental<br/>
+It computes Cohen's kappa, its standard error, confidence interval, and several useful descriptive statistics and diagnostic measures.
 
-          Created by Giuseppe Cardillo
-          giuseppe.cardillo-edta@poste.it
+---
 
-To cite this file, this would be an appropriate format:
-Cardillo G. (2007) Cohen's kappa: compute the Cohen's kappa ratio on a square matrix.   
-http://www.mathworks.com/matlabcentral/fileexchange/15365
+## ✨ Features
+
+- Supports **unweighted, linear, quadratic, and custom** weighting schemes
+- Accepts any **square contingency table** of nonnegative integer frequencies
+- Returns:
+  - Kappa estimate
+  - Confidence interval for kappa
+  - Detailed statistics in a structured output
+- Implements **Landis & Koch** qualitative classification of agreement
+- Performs **z-test** for the null hypothesis of purely accidental agreement
+- Optional **textual output** for quick inspection in the Command Window
+- Robust input validation and basic numerical stability checks
+
+---
+
+## 📥 Function syntax
+
+Basic calls:
+
+- kappa(X)
+- kappa(X, W)
+- kappa(X, W, ALPHA)
+- kappa(X, W, ALPHA, DISPLAY)
+- [K, CI] = kappa(...)
+- [K, CI, STATS] = kappa(...)
+
+Where:
+
+- X  
+  Square M-by-M matrix of **nonnegative integer frequencies**, representing the cross-classification of two raters (or methods) on M mutually exclusive categories.
+
+- W  
+  Weight specification:
+  - Scalar:
+    - 0 → unweighted (default)
+    - 1 → linearly weighted
+    - 2 → quadratically weighted
+  - Matrix:
+    - M-by-M custom weight matrix (for M categories).
+
+- ALPHA  
+  Significance level for the confidence interval (default 0.05).
+
+- DISPLAY  
+  Logical flag (true/false).  
+  - true (default) → prints a formatted report in the Command Window  
+  - false → silent mode (only outputs are returned)
+
+Outputs:
+
+- K  
+  Cohen's kappa estimate.
+
+- CI  
+  1-by-2 vector with the lower and upper bounds of the confidence interval for kappa.
+
+- STATS  
+  Structure containing auxiliary results:
+  - po                     – observed agreement
+  - pe                     – expected agreement by chance
+  - trueAgreement          – po - pe
+  - residualAgreement      – 1 - pe
+  - kappa                  – kappa estimate
+  - se                     – standard error of kappa
+  - ci                     – confidence interval for kappa
+  - alpha                  – significance level
+  - z                      – z statistic
+  - p                      – p-value
+  - kappaMax               – maximum possible kappa given the margins
+  - kappaRatio             – kappa / kappaMax
+  - weightsType            – 'unweighted', 'linear', 'quadratic', or 'custom'
+  - weightMatrix           – weight matrix actually used
+  - n                      – total number of observations
+  - m                      – number of categories
+  - maxObservableAgreement – maximum observable agreement (pom)
+  - landisKochClass        – qualitative classification of agreement
+
+---
+
+## 📊 Example
+
+Simple example with a 3×3 contingency table:
+
+x = [88 14 18; ...
+     10 40 10; ...
+      2  6 12];
+
+% Unweighted kappa, with printed report
+kappa(x);
+
+% Linear weights, 95% CI, silent mode with full stats
+[k, ci, stats] = kappa(x, 1, 0.05, false);
+
+The first call prints a complete report (observed and expected agreement, kappa, standard error, confidence interval, Landis & Koch class, z statistic, p-value, etc.). The second call suppresses printing and returns all key quantities programmatically.
+
+---
+
+## 🧮 Weighting schemes
+
+- Unweighted (W = 0)  
+  Only exact agreement (diagonal) is given full credit (weight = 1); off-diagonal cells have weight 0.
+
+- Linear weights (W = 1)  
+  Weights decrease linearly as categories become more distant, assuming an ordinal structure:
+  - For categories i and j, the weight is:
+    1 - |i - j| / (M - 1)
+
+- Quadratic weights (W = 2)  
+  Weights decrease quadratically with distance:
+  - For categories i and j, the weight is:
+    1 - ((i - j) / (M - 1))^2
+
+- Custom weights (W = M×M matrix)  
+  User provides a full M-by-M matrix of weights, typically with:
+  - Values in [0, 1]
+  - Diagonal elements equal to 1 (perfect agreement)
+  This allows for arbitrary weighting structures tailored to specific problems.
+
+---
+
+## 🧾 Landis & Koch benchmarks
+
+The function classifies the resulting kappa according to the widely cited Landis and Koch (1977) benchmarks:
+
+- k < 0           → Poor agreement
+- 0.00–0.20       → Slight agreement
+- 0.21–0.40       → Fair agreement
+- 0.41–0.60       → Moderate agreement
+- 0.61–0.80       → Substantial agreement
+- 0.81–1.00       → Perfect agreement
+
+The qualitative class is returned in STATS.landisKochClass and printed in the report when DISPLAY is true.
+
+---
+
+## 📚 References
+
+- Cohen J. (1960). A coefficient of agreement for nominal scales. Educational and Psychological Measurement, 20(1), 37–46.
+- Landis JR, Koch GG. (1977). The measurement of observer agreement for categorical data. Biometrics, 33(1), 159–174.
+- Cardillo G. (2007). Cohen's kappa: compute the Cohen's kappa ratio on a square matrix. Available from:  
+  https://github.com/dnafinder/Cohen
+
+---
+
+## 📁 Repository structure
+
+Main files:
+
+- kappa.m  
+  Core function implementing Cohen's kappa (unweighted, weighted, and custom weights).
+
+Additional files (if present) may include:
+
+- Examples or demo scripts
+- Test scripts
+- Documentation or auxiliary utilities
+
+---
+
+## 🚀 Getting started
+
+1. Clone or download the repository:
+
+   - GitHub: https://github.com/dnafinder/Cohen
+
+2. Add the folder containing kappa.m to your MATLAB path, for example:
+
+   - In MATLAB: Home → Set Path → Add Folder
+   - Or programmatically with addpath
+
+3. Call kappa from the Command Window or from your own scripts/functions:
+
+   - kappa(X)
+   - [k, ci, stats] = kappa(X, 1, 0.01, false);
+
+---
+
+## 🧪 Testing and validation
+
+To validate your installation and understand the output:
+
+- Run the example in the help section of kappa.m
+- Compare with published examples or with other implementations (e.g., statistical software) for known contingency tables
+
+If you use custom weight matrices, always verify that your weights are appropriate for the ordinal or quasi-ordinal structure of your categories.
+
+---
+
+## ⚖️ License and citation
+
+Please refer to the license file provided in the repository (if present) for detailed licensing terms.
+
+If you use this code in scientific work, software, or teaching material, an appropriate citation is:
+
+Cardillo G. (2007). Cohen's kappa: compute the Cohen's kappa ratio on a square matrix. Available from:  
+https://github.com/dnafinder/Cohen
